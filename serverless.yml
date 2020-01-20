@@ -1,0 +1,33 @@
+service: home-ai-rss-service
+
+provider:
+  name: aws
+  region: eu-central-1
+  runtime: provided
+  environment:
+    APP_ENV: prod
+    APP_SECRET: ny0rl3Qf2XYoMG2PtNf4VqmOEaOhBlvF
+
+plugins:
+  - ./vendor/bref/bref
+
+package:
+  exclude:
+    - node_modules/**
+    - tests/**
+
+functions:
+  website:
+    handler: public/index.php
+    timeout: 28
+    layers:
+      - ${bref:layer.php-73-fpm}
+    events:
+      -   http: 'ANY /'
+      -   http: 'ANY /{proxy+}'
+  console:
+    handler: bin/console
+    timeout: 120 # in seconds
+    layers:
+      - ${bref:layer.php-73} # PHP
+      - ${bref:layer.console} # The "console" layer
